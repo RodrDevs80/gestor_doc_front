@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import logo from '../assets/logoRayo.png'
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+// no olividar cambiar a por Link
 const LoginForm = () => {
     const {
         register,
@@ -156,7 +156,7 @@ const LoginForm = () => {
                 {/* Mensaje de admin logueado */}
                 {isAdmin && (
                     <p className="mt-4 text-center text-green-600 font-semibold">
-                        ✅ Has iniciado sesión como Administrador
+                        Has iniciado sesión como Administrador
                     </p>
                 )}
             </div>
