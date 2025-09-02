@@ -1,5 +1,7 @@
 import { useForm } from "react-hook-form";
 import logo from '../assets/logoRayo.png'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
     const {
@@ -8,9 +10,30 @@ const LoginForm = () => {
         formState: { errors },
     } = useForm({ mode: "onChange" });
 
+    const [isAdmin, setIsAdmin] = useState(false);
+    const navigate = useNavigate();
+    const [errorLogin, setErrorLogin] = useState("");
+
     const onSubmit = (data) => {
         console.log("Datos enviados:", data);
+        if (data.email === admin.email && data.password === admin.password) {
+            setIsAdmin(true);
+            setErrorLogin("");
+            navigate("/admin");
+        } else {
+            setIsAdmin(false);
+            setErrorLogin("Credenciales incorrectas");
+        }
     };
+
+    const admin = {
+        email: 'admin@gmail.com',
+        password: 'admin1234'
+    }
+
+
+
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-pink-100">
@@ -84,8 +107,8 @@ const LoginForm = () => {
                                     message: "Mínimo 6 caracteres",
                                 },
                                 maxLength: {
-                                value: 30,
-                                message: "Máximo 30 caracteres",
+                                    value: 30,
+                                    message: "Máximo 30 caracteres",
                                 }
 
                             })}
@@ -115,6 +138,12 @@ const LoginForm = () => {
                     }hover:bg-pink-500 hover:shadow-lg transition">
                         ingresar
                     </button>
+                    {/* Mensaje de error */}
+                    {errorLogin && (
+                        <p className="mt-3 text-center text-red-600 font-semibold">
+                            {errorLogin}
+                        </p>
+                    )}
                 </form>
 
                 {/* Footer */}
@@ -124,6 +153,12 @@ const LoginForm = () => {
                         Regístrate
                     </a>
                 </p>
+                {/* Mensaje de admin logueado */}
+                {isAdmin && (
+                    <p className="mt-4 text-center text-green-600 font-semibold">
+                        ✅ Has iniciado sesión como Administrador
+                    </p>
+                )}
             </div>
         </div>
     );
