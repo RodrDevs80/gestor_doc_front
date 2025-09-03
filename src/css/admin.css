@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* Colores y variables de panel admin */
+:root {
+  --primary-color: #E6A4B4;
+  --secondary-color: #FDF0F3;
+  --background-color: #FAE7EC;
+  --text-primary: #6D4C5C;
+  --text-secondary: #8E6E7E;
+  --accent-color: #D689A0;
+}
+
+/* Estilos generales */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+}
+
+/* Container de la tabla */
+.table-container {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background-color: var(--secondary-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
