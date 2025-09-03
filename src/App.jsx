@@ -7,11 +7,11 @@ import AppRoutes from "./routes/AppRoutes.jsx";
 function App() {
   return (
     <>
-    <BrowserRouter>
+    {/* <BrowserRouter>
     <AppRoutes/>
-    </BrowserRouter>
+    </BrowserRouter> */}
     {/* <LoginForm/> */}
-    {/* <FileUploadModal/> */}
+    <FileUploadModal/>
     {/* <Spinner/> */}
     {/* <Loader/> */}
     </>
