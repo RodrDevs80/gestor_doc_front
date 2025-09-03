@@ -2,7 +2,7 @@ import React,{useState} from "react";
 import { useForm } from "react-hook-form";
 import { Trash2, Upload } from "lucide-react";
 import Loader from "../../components/Loader";
-// import Spinner from "../../components/Spinner";
+
 
 const FileUploadModal = () => {
     const {
