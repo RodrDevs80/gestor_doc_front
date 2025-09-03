@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import logo from '../assets/logoRayo.png'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // no olividar cambiar a por Link
 const LoginForm = () => {
@@ -19,10 +19,12 @@ const LoginForm = () => {
         if (data.email === admin.email && data.password === admin.password) {
             setIsAdmin(true);
             setErrorLogin("");
+            localStorage.setItem("isAdmin", "true"); 
             navigate("/admin");
         } else {
             setIsAdmin(false);
             setErrorLogin("Credenciales incorrectas");
+            localStorage.removeItem("isAdmin");
         }
     };
 
@@ -32,7 +34,14 @@ const LoginForm = () => {
     }
 
 
+    useEffect(()=>{
+        const adminStatus = localStorage.getItem('isAdmin');
+        if(adminStatus === "true"){
+            setIsAdmin(true);
+             navigate("/admin");
+        }
 
+    },[])
 
 
     return (
@@ -135,7 +144,7 @@ const LoginForm = () => {
                     <button
                         type="submit"
                         className="w-full bg-pink-400 font-bold cursor-pointer text-white py-2 rounded-md 
-                    }hover:bg-pink-500 hover:shadow-lg transition">
+                    hover:bg-pink-500 hover:shadow-lg transition">
                         ingresar
                     </button>
                     {/* Mensaje de error */}
