@@ -1,29 +1,38 @@
-import React,{useState} from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
 import { Trash2, Upload } from "lucide-react";
 import Loader from "../../components/Loader";
 
 
-const FileUploadModal = () => {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm({ mode: "onChange" });
 
+const FileUploadModal = ({ productId, onClose }) => {
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
-    const [isLoading,setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const onSubmit = async(data) => {
-        console.log("Formulario válido:", data);
-        setIsLoading(true)
-        //  tengo que cambiar lo siguiente por el axios
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        setIsLoading(false); 
-        reset();
-        setUploadedFiles([]);
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        if (uploadedFiles.length === 0) return;
+
+        setIsLoading(true);
+        try {
+            const formData = new FormData();
+            uploadedFiles.forEach((file) => {
+                formData.append("archivo", file);
+            });
+
+            // TODO: reemplazar fetch por axios/api
+            await fetch(`http://localhost:3000/api/v1/files/upload/${productId}`, {
+                method: "POST",
+                body: formData,
+            });
+
+            setUploadedFiles([]);
+            if (onClose) onClose();
+        } catch (error) {
+            console.error("Error subiendo archivos:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleFileChange = (e) => {
@@ -52,62 +61,18 @@ const FileUploadModal = () => {
     };
 
     if (isLoading) return <Loader />;
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <div className="bg-pink-50 p-6 rounded-lg shadow-lg w-full max-w-md">
+            <div className="bg-pink-50 p-6 rounded-lg shadow-lg w-full max-w-md relative">
+                <button onClick={onClose} className="absolute top-2 right-5 cursor-pointer text-xl font-bold text-gray-500 hover:text-gray-800">
+                X
+                </button>
                 <h2 className="text-2xl font-bold text-pink-900 mb-4">
-                    Gestionar Archivos de Producto
+                    Subir archivos
                 </h2>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    {/* ID Producto */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            ID de Producto
-                        </label>
-                        <input
-                            type="text"
-                            className="mt-1 w-full rounded-md border border-pink-300 p-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                            placeholder="PROD-12345"
-                            {...register("productId", { required: "El ID es obligatorio" })}
-                        />
-                        {errors.productId && (
-                            <p className="text-pink-600 font-semibold text-sm mt-1">
-                                {errors.productId.message}
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Nombre descriptivo */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                            Nombre descriptivo
-                        </label>
-                        <input
-                            type="text"
-                            maxLength={30}
-                            minLength={3}
-                            className="mt-1 w-full rounded-md border border-pink-300 p-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                            placeholder="Ej: Manual de Usuario"
-                            {...register("fileName", {
-                                required: "El nombre es obligatorio",
-                                minLength: {
-                                    value: 3,
-                                    message: "Debe tener al menos 3 caracteres",
-                                },
-                                maxLength: {
-                                    value: 30,
-                                    message: "No puede superar los 30 caracteres",
-                                },
-                            })}
-                        />
-                        {errors.fileName && (
-                            <p className="text-pink-600 font-semibold text-sm mt-1">
-                                {errors.fileName.message}
-                            </p>
-                        )}
-                    </div>
-
+                <form onSubmit={onSubmit} className="space-y-4">
                     {/* Subida de archivos con Drag & Drop */}
                     <div
                         className={`border-2 border-dashed rounded-lg p-4 text-center transition ${
@@ -121,7 +86,9 @@ const FileUploadModal = () => {
                         <p className="text-sm text-gray-600">
                             Sube archivos o arrástralos aquí
                         </p>
-                        <p className="text-xs text-gray-400">PDF, DOCX, XLSX, PNG, JPG (máx. 10MB)</p>
+                        <p className="text-xs text-gray-400">
+                            PDF, DOCX, XLSX, PNG, JPG (máx. 10MB)
+                        </p>
                         <input
                             type="file"
                             className="hidden"
@@ -137,11 +104,11 @@ const FileUploadModal = () => {
                         </label>
                     </div>
 
-                    {/* Archivos cargados */}
+                    {/* Archivos cargados con preview */}
                     {uploadedFiles.length > 0 && (
                         <div>
                             <p className="text-sm font-medium text-gray-700 mb-2">
-                                Archivos Cargados:
+                                Archivos seleccionados:
                             </p>
                             <ul className="space-y-2">
                                 {uploadedFiles.map((file, index) => (
@@ -149,7 +116,17 @@ const FileUploadModal = () => {
                                         key={index}
                                         className="flex items-center justify-between border rounded-md px-3 py-2 bg-white"
                                     >
-                                        <span className="text-sm text-gray-700">{file.name}</span>
+                                        <div className="flex items-center gap-2">
+                                            {/* Si es imagen, mostrar thumbnail */}
+                                            {file.type.startsWith("image/") && (
+                                                <img
+                                                    src={URL.createObjectURL(file)}
+                                                    alt={file.name}
+                                                    className="w-12 h-12 object-cover rounded"
+                                                />
+                                            )}
+                                            <span className="text-sm text-gray-700">{file.name}</span>
+                                        </div>
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveFile(index)}
@@ -167,6 +144,7 @@ const FileUploadModal = () => {
                     <div className="flex justify-end space-x-2 pt-2">
                         <button
                             type="button"
+                            onClick={onClose}
                             className="px-4 py-2 font-bold rounded-md border border-gray-300 text-gray-800 hover:bg-gray-400"
                         >
                             Cancelar
@@ -183,4 +161,5 @@ const FileUploadModal = () => {
         </div>
     );
 };
+
 export default FileUploadModal;
