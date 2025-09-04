@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import logo from '../assets/logoRayo.png'
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import Navbar from "../components/Navbar.jsx";
 // no olividar cambiar a por Link
 const LoginForm = () => {
     const {
