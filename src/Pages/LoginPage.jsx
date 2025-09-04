@@ -38,9 +38,8 @@ const LoginForm = () => {
         const adminStatus = localStorage.getItem('isAdmin');
         if(adminStatus === "true"){
             setIsAdmin(true);
-             navigate("/admin");
+            navigate("/admin");
         }
-
     },[])
 
 

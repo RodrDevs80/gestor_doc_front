@@ -11,7 +11,7 @@ function App() {
     <AppRoutes/>
     </BrowserRouter>
     {/* <LoginForm/> */}
-    {/* <FileUploadModal/> */}
+    <FileUploadModal/>
     {/* <Loader/> */}
     </>
   )
