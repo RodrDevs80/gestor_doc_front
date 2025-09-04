@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../css/admin.css'
 import CreateProductModal from './CreateProductModal'
 
 const AdminPage = () => {
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] = useState(false)
+  const navigate = useNavigate()
   const productos = [
     {
       nombre: "Producto Elegante",
@@ -41,11 +43,18 @@ const AdminPage = () => {
           <h1 className="text-3xl font-bold text-[var(--text-primary)]">Gestión de Archivos</h1>
           <p className="text-[var(--text-secondary)] mt-1">Administra los archivos asociados a tus productos.</p>
         </div>
-        <button 
-        onClick={() => setIsCreateProductModalOpen(true)}
-        className="mt-4 sm:mt-0 flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-[var(--primary-color)] rounded-full hover:bg-[var(--accent-color)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:ring-offset-2 focus:ring-offset-[var(--background-color)] transition-colors">
-          <span className="material-icons mr-2">add</span> Agregar Producto
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
+          <button 
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center px-6 py-3 text-sm font-medium text-[var(--primary-color)] bg-white border border-[var(--primary-color)] rounded-full hover:bg-[var(--primary-color)] hover:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:ring-offset-2 focus:ring-offset-[var(--background-color)] transition-colors">
+            <span className="material-icons mr-2">home</span> Visitar Tienda
+          </button>
+          <button 
+          onClick={() => setIsCreateProductModalOpen(true)}
+          className="flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-[var(--primary-color)] rounded-full hover:bg-[var(--accent-color)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:ring-offset-2 focus:ring-offset-[var(--background-color)] transition-colors">
+            <span className="material-icons mr-2">add</span> Agregar Producto
+          </button>
+        </div>
       </header>
      
       <div className="table-container bg-[var(--secondary-color)] rounded-lg overflow-hidden shadow-md">
