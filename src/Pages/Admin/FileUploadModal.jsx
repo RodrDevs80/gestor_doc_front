@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Trash2, Upload } from "lucide-react";
 import Loader from "../../components/Loader";
-
+import api from "../../services/api.js";
 
 
 const FileUploadModal = ({ productId, onClose }) => {
+    console.log("productId:", productId);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,10 +21,10 @@ const FileUploadModal = ({ productId, onClose }) => {
                 formData.append("archivo", file);
             });
 
-            // TODO: reemplazar fetch por axios/api
-            await fetch(`http://localhost:3000/api/v1/files/upload/${productId}`, {
-                method: "POST",
-                body: formData,
+            await api.post(`files/upload/${productId}`, formData,{
+                headers:{
+                    "Content-Type": "multipart/form-data"
+                }
             });
 
             setUploadedFiles([]);
@@ -63,8 +64,9 @@ const FileUploadModal = ({ productId, onClose }) => {
     if (isLoading) return <Loader />;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-            <div className="bg-pink-50 p-6 rounded-lg shadow-lg w-full max-w-md relative">
+        <div className="fixed inset-0 flex items-center justify-center ">
+            <div className="parallax-backdrop"></div>
+            <div className="modal-container bg-pink-50 p-6 rounded-lg shadow-lg w-full max-w-md relative">
                 <button onClick={onClose} className="absolute top-2 right-5 cursor-pointer text-xl font-bold text-gray-500 hover:text-gray-800">
                 X
                 </button>
