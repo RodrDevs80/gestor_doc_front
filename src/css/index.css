@@ -1,5 +1,12 @@
 @import "tailwindcss";
-
+:root {
+    --primary-color: #E6A4B4;
+    --secondary-color: #FDF0F3;
+    --background-color: #FAE7EC;
+    --text-primary: #6D4C5C;
+    --text-secondary: #8E6E7E;
+    --accent-color: #D689A0;
+}
 
 .wheel-and-hamster {
     --dur: 1s;
