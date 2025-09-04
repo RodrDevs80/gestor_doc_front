@@ -2,9 +2,6 @@
 import React from "react";
 import { useState } from "react";
 
-const handleChange = (e, setState) => {
-    setState(e.target.value);
-};
 const ProductManagementModal = ({
 	isOpen=true,
 	onClose,
@@ -26,6 +23,37 @@ const ProductManagementModal = ({
     const [description, setDescription] = useState(product.description)
     const [files, setFiles] = useState(product.files)
 
+	// Manejo de inputs
+	const handleChange = (e, setState) => {
+		setState(e.target.value);
+	};
+
+	// Manejo de archivos
+	const handleFileChange = (e) => {
+		const newFiles = Array.from(e.target.files).map((file) => ({
+			name: file.name,
+			file,
+		}));
+		setFiles((prev) => [...prev, ...newFiles]);
+	};
+
+	const handleRemoveFile = (index) => {
+		setFiles((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	// Enviar todo el formulario
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		onSave &&
+			onSave({
+				id,
+				price,
+				stock,
+				description,
+				files,
+			});
+	};
+
 	if (!isOpen) return null;
 
 
@@ -45,7 +73,7 @@ const ProductManagementModal = ({
 						</svg>
 					</button>
 				</div>
-				<form className="space-y-4" onSubmit={e => { e.preventDefault(); onSave && onSave(); }}>
+				<form className="space-y-4" onSubmit={handleSubmit}>
 					<div>
 						<label className="block text-sm font-medium text-[var(--text-secondary)]" htmlFor="product-id">ID de Producto</label>
 						<input
@@ -105,7 +133,13 @@ const ProductManagementModal = ({
 								<div className="flex text-sm text-gray-600">
 									<label className="relative cursor-pointer bg-[var(--secondary-color)] rounded-md font-medium text-[var(--primary-color)] hover:text-[var(--accent-color)] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--accent-color)]" htmlFor="file-upload">
 										<span>Sube un archivo</span>
-										<input className="sr-only" id="file-upload" name="file-upload" type="file" multiple/>
+										<input 
+											className="hidden" 
+											id="file-upload" 
+											name="file-upload" 
+											type="file" 
+											multiple
+											onChange={handleFileChange}/>
 									</label>
 									<p className="pl-1 text-[var(--text-secondary)]">o arrastra y suelta</p>
 								</div>
@@ -116,7 +150,7 @@ const ProductManagementModal = ({
 					<div className="space-y-2">
 						<p className="text-sm font-medium text-[var(--text-secondary)]">Archivos Cargados:</p>
 						<ul className="border border-[var(--primary-color)] rounded-md divide-y divide-[var(--primary-color)]">
-							{product.files.map((file, idx) => (
+							{files.map((file, idx) => (
 								<li key={file.name} className="p-3 flex items-center justify-between text-sm">
 									<div className="flex items-center">
 										<svg className="h-5 w-5 text-[var(--accent-color)] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -124,7 +158,12 @@ const ProductManagementModal = ({
 										</svg>
 										<span className="text-[var(--text-primary)]">{file.name}</span>
 									</div>
-									<button className="text-red-400 hover:text-red-600" type="button" aria-label="Eliminar archivo">
+									<button 
+										className="text-red-400 
+										hover:text-red-600" 
+										type="button" 
+										aria-label="Eliminar archivo"
+										onClick={() => handleRemoveFile(idx)}>
 										<svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 											<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
 										</svg>
