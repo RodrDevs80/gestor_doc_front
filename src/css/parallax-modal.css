@@ -1,0 +1,70 @@
+/* Efecto Parallax para Modales */
+@keyframes parallaxFloat {
+  0%, 100% { 
+    backdrop-filter: blur(8px) saturate(150%);
+    background-position: 0% 50%;
+  }
+  50% { 
+    backdrop-filter: blur(12px) saturate(180%);
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes modalSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Clase para el backdrop con efecto parallax */
+.parallax-backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);
+  animation: parallaxFloat 6s ease-in-out infinite;
+  backdrop-filter: blur(8px) saturate(150%);
+  background-size: 200% 200%;
+}
+
+/* Clase para el contenedor del modal */
+.modal-container {
+  animation: modalSlideIn 0.3s ease-out;
+  position: relative;
+  z-index: 10;
+}
+
+/* Variante más intensa del parallax para contextos especiales */
+.parallax-backdrop-intense {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);
+  animation: parallaxFloat 4s ease-in-out infinite;
+  backdrop-filter: blur(12px) saturate(200%);
+  background-size: 300% 300%;
+}
+
+/* Animación más suave para modales pequeños */
+@keyframes parallaxFloatGentle {
+  0%, 100% { 
+    backdrop-filter: blur(6px) saturate(120%);
+    background-position: 0% 50%;
+  }
+  50% { 
+    backdrop-filter: blur(10px) saturate(150%);
+    background-position: 100% 50%;
+  }
+}
+
+.parallax-backdrop-gentle {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.15) 100%);
+  animation: parallaxFloatGentle 8s ease-in-out infinite;
+  backdrop-filter: blur(6px) saturate(120%);
+  background-size: 150% 150%;
+}

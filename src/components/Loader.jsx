@@ -1,6 +1,6 @@
 import React from 'react'
 import '../css/index.css'
-const Loader = () => {
+const Loader = ({title}) => {
     return (
 
         <div className="loader-wrapper">
@@ -25,7 +25,7 @@ const Loader = () => {
                 </div>
 
                 <div className="loader">
-                    <span className="loader-text">Enviando...</span>
+                    <span className="loader-text">{title || "Enviando..."}</span>
                 </div>
             </div>
         </div>
