@@ -9,31 +9,6 @@ const FileUploadModal = ({ productId, onClose, onFilesUploaded }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  //   const onSubmit = async (e) => {
-  //     e.preventDefault();
-  //     if (uploadedFiles.length === 0) return;
-
-  //     setIsLoading(true);
-  //     try {
-  //       const formData = new FormData();
-  //       uploadedFiles.forEach((file) => {
-  //         formData.append("archivo", file);
-  //       });
-
-  //       await api.post(`files/upload/${productId}`, formData, {
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //         },
-  //       });
-
-  //       setUploadedFiles([]);
-  //       if (onClose) onClose();
-  //     } catch (error) {
-  //       console.error("Error subiendo archivos:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
   const onSubmit = async (e) => {
     e.preventDefault();
     if (uploadedFiles.length === 0) return;
@@ -42,10 +17,10 @@ const FileUploadModal = ({ productId, onClose, onFilesUploaded }) => {
     try {
       const formData = new FormData();
       uploadedFiles.forEach((file) => {
-        formData.append("archivo", file);
+        formData.append("archivos", file);
       });
 
-      await api.post(`files/upload/${productId}`, formData, {
+      await api.post(`files/upload/multiple/${productId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
