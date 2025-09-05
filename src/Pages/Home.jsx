@@ -1,7 +1,7 @@
 import React from 'react'
 import api from '../services/api';
 import { useEffect, useState } from 'react';
-//import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Loader from '../components/Loader';
 
 const Home = () => {
@@ -9,7 +9,7 @@ const Home = () => {
    const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const navigate=useNavigate()
+  const navigate=useNavigate()
   useEffect(() => {
     const fetchProductos = async () => {
       try {
@@ -37,9 +37,9 @@ const Home = () => {
     fetchProductos();
   }, []);
 
-  // function navergarDetalle(id){
-  //   navigate(`/productos/${id}`)
-  // } 
+  function goToProductDetail(id){
+    navigate(`/productos/${id}`)
+  } 
 
   return (
     <>
@@ -70,9 +70,10 @@ const Home = () => {
               ${product.precio}
             </p>
            <button 
-           //onClick={navergarDetalle(product.id)}
-           type="button" aria-label={`Añadir ${product.nombre}`} className="px-4 py-2 text-sm font-medium text-white bg-[#E6A4B4] rounded-full hover:bg-[#D689A0] focus:outline-none focus:ring-2 focus:ring-[#D689A0] focus:ring-offset-2 focus:ring-offset-[#FDF0F3] transition" >
-                 VER
+           onClick={() => goToProductDetail(product.id)}
+           type="button" aria-label={`Añadir ${product.nombre}`} 
+           className="px-4 py-2 text-sm font-medium text-white bg-[#E6A4B4] rounded-full hover:bg-[#D689A0] focus:outline-none focus:ring-2 focus:ring-[#D689A0] focus:ring-offset-2 focus:ring-offset-[#FDF0F3] transition" >
+                 Ver Más
                 </button>
               
             </div>

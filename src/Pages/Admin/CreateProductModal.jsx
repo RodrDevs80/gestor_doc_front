@@ -3,8 +3,9 @@ import { useForm } from "react-hook-form";
 import { Package, X } from "lucide-react";
 import Loader from "../../components/Loader";
 import "../../css/parallax-modal.css";
+import api from "../../services/api";
 
-const CreateProductModal = ({ isOpen, onClose, onCreateProduct }) => {
+const CreateProductModal = ({ isOpen, onClose, onProductCreated }) => {
   const {
     register,
     handleSubmit,
@@ -13,27 +14,33 @@ const CreateProductModal = ({ isOpen, onClose, onCreateProduct }) => {
   } = useForm({ mode: "onChange" });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const onSubmit = async (data) => {
     console.log("Datos del producto:", data);
     setIsLoading(true);
-
-    try {
-      // Aquí iría la llamada a la API para crear el producto
-      if (onCreateProduct) {
-        await onCreateProduct(data);
+    
+    // Timeout de 2 segundos
+    setTimeout(async () => {
+      try {
+        const response = await api.post("/productos", data);
+        console.log(response.data,'response.data');
+        if(response.success && response.status === 201){
+          setError(null);
+          reset();
+          setIsLoading(false);
+          // Notificar al componente padre que se creó el producto
+          if (onProductCreated) {
+            onProductCreated();
+          } else {
+            onClose();
+          }
+        }
+      } catch (error) {
+        setError(error.message);
+        setIsLoading(false);
       }
-
-      // Simular delay de red
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      reset();
-      onClose();
-    } catch (error) {
-      console.error("Error al crear producto:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    }, 2000);
   };
 
   const handleCancel = () => {

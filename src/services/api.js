@@ -6,7 +6,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    console.log(config)
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -19,7 +18,18 @@ api.interceptors.request.use(
 // Interceptor de response con switch
 api.interceptors.response.use(
   (response) => {
-    // Si es exitoso, retornamos estructura uniforme
+    // Si es una respuesta de blob (descarga de archivo), mantener los datos tal como están
+    if (response.config.responseType === 'blob') {
+      return {
+        success: true,
+        status: response.status,
+        data: response.data, // El blob se mantiene intacto
+        headers: response.headers,
+        message: null,
+      };
+    }
+    
+    // Si es exitoso, retornamos estructura uniforme para respuestas JSON
     return {
       success: true,
       status: response.status,

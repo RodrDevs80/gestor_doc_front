@@ -6,6 +6,7 @@ import CreateProductModal from "../Pages/Admin/CreateProductModal.jsx";
 import ProductManagementModal from "../Pages/Admin/ProductManagementModal.jsx";
 import FileUploadModal from "../Pages/Admin/FileUploadModal.jsx";
 import MainLayouts from "../Pages/Layouts/MainLayouts.jsx";
+import ProductCard from "../components/ProductCard.jsx";
 
 const AppRoutes = () => {
     return (
@@ -13,6 +14,7 @@ const AppRoutes = () => {
     <Routes>
         <Route element={<MainLayouts/>}>
         <Route path="/" element={<Home/>}/>
+        <Route path="/productos/:id" element={<ProductCard/>}/>
         <Route path="/admin" element={<AdminPage/>}/>
         {/* aca falta la de detalle de productos */}
         </Route>

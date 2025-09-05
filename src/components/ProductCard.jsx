@@ -1,49 +1,121 @@
-import React, { useState } from "react";
-import { defaultProduct } from "../data/productData";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../services/api";
+import Loader from "./Loader";
 
 const ProductCard = ({
-  product = defaultProduct,
   onAddToCart,
-  onBack,
 }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [producto, setProducto] = useState();
+  const [productImages, setProductImages] = useState([]);
+  const [files, setFiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  console.log(id,'id-producto');
 
+  useEffect(() => {
+    getProductDetail();
+    getProductImages();
+    getFilesbyProductId();
+  }, [])
+  
+
+
+  const dowloadFile = async (fileName) => {
+    try {
+      // Configurar axios para recibir datos binarios
+      const response = await api.get(`/files/download/${fileName}`, {
+        responseType: 'blob' // Esto es crucial para archivos binarios
+      });
+
+      if (response.success && response.data) {
+        // Crear un blob desde los datos
+        const blob = new Blob([response.data], { 
+          type: response.headers?.['content-type'] || 'application/octet-stream' 
+        });
+        
+        // Crear URL temporal para el blob
+        const url = window.URL.createObjectURL(blob);
+        
+        // Crear elemento <a> temporal para iniciar la descarga
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName; // Nombre del archivo a descargar
+        
+        // Agregar al DOM temporalmente y hacer click
+        document.body.appendChild(link);
+        link.click();
+        
+        // Limpiar
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+      } else {
+        throw new Error('No se recibieron datos válidos del servidor');
+      }
+    } catch (error) {
+      setError(`Error al descargar el archivo: ${error.message}`);
+    }
+  }
+  const getFilesbyProductId = async () => {
+    try {
+      const response = await api.get(`/files/${id}`);
+      if(response.success && response.status === 200){
+        setFiles(response.data.archivos);
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  }
+
+ const getProductImages = async () => {
+  try {
+    const response = await api.get(`/files/imagenes-db/${id}`);
+    if(response.success && response.status === 200){
+      console.log(JSON.stringify(response.data,null,2),'response.data');
+      setProductImages(response.data.images);
+    }
+  } catch (error) {
+    setError(error.message);
+  }
+ }
+
+
+  const getProductDetail = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get(`/productos/${id}`);
+      
+      if(response.success && response.status === 200){
+        setProducto(response.data.Producto); 
+      } else {
+        setError(response.message || 'Error al cargar el producto');
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      setError(error.message);
+      console.error('Error al obtener producto:', error);
+    }
+
+  }
   const handleQuantityChange = (delta) => {
     setQuantity((prev) => Math.max(1, prev + delta));
   };
 
   const handleAddToCart = () => {
     if (onAddToCart) {
-      onAddToCart(product, quantity);
+      onAddToCart(producto, quantity);
     }
-  };
-
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const stars = [];
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <span key={i} className="material-icons text-[var(--primary-color)]">
-          star
-        </span>
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <span key="half" className="material-icons text-[var(--primary-color)]">
-          star_half
-        </span>
-      );
-    }
-
-    return stars;
   };
 
   return (
+    <>
+    {isLoading && <Loader title="Cargando..."/>}
     <div className="bg-[var(--background-color)] text-[var(--text-primary)] min-h-screen">
       <style>
         {`
@@ -75,11 +147,12 @@ const ProductCard = ({
                 <img
                   alt="Producto Principal"
                   className="w-full h-auto object-cover"
-                  src={product.images[selectedImage]}
+                  src={productImages.length > 0 ? productImages[selectedImage]?.apiUrl : producto?.imagenUrl}
                 />
               </div>
+              {/*  ENDPOINT PARA GRUPO DE IMAGENES */}
               <div className="flex space-x-2">
-                {product.images.map((image, index) => (
+                {productImages.length && productImages.map((image, index) => (
                   <button
                     key={index}
                     className={`thumbnail w-20 h-20 rounded-md overflow-hidden transition duration-200 ${
@@ -90,7 +163,7 @@ const ProductCard = ({
                     <img
                       alt={`Miniatura ${index + 1}`}
                       className="w-full h-full object-cover"
-                      src={image}
+                      src={image.apiUrl}
                     />
                   </button>
                 ))}
@@ -102,36 +175,31 @@ const ProductCard = ({
           <div className="flex flex-col justify-center">
             <button
               className="text-sm text-[var(--text-secondary)] hover:text-[var(--primary-color)] mb-2 flex items-center"
-              onClick={onBack}
+              onClick={() => navigate("/")}
             >
               <span className="material-icons text-base mr-1">arrow_back</span>
               Volver a productos
             </button>
 
             <h1 className="text-4xl lg:text-5xl font-bold text-[var(--text-primary)] mb-3">
-              {product.name}
+              {producto?.nombre}
             </h1>
 
             <div className="flex items-center mb-4">
-              <div className="flex">{renderStars(product.rating)}</div>
+              <div className="flex">3.5</div>
               <span className="ml-2 text-sm text-[var(--text-secondary)]">
-                ({product.reviews} reseñas)
+                100 reseñas
               </span>
             </div>
 
             <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
-              {product.description}
+              {producto?.descripcion}
             </p>
 
             <div className="mb-6">
               <span className="text-4xl font-bold text-[var(--primary-color)]">
-                ${product.price}
+                ${producto?.precio}
               </span>
-              {product.originalPrice && (
-                <span className="ml-2 text-lg text-[var(--text-secondary)] line-through">
-                  ${product.originalPrice}
-                </span>
-              )}
             </div>
 
             <div className="flex items-center space-x-4 mb-8">
@@ -164,13 +232,13 @@ const ProductCard = ({
               <div className="flex items-center text-sm text-[var(--text-secondary)]">
                 <span
                   className={`material-icons text-base mr-2 ${
-                    product.inStock ? "text-green-500" : "text-red-500"
+                    producto?.stock > 0 ? "text-green-500" : "text-red-500"
                   }`}
                 >
-                  {product.inStock ? "check_circle" : "cancel"}
+                  {producto?.stock > 0 ? "check_circle" : "cancel"}
                 </span>
                 <span>
-                  {product.inStock ? "En stock, listo para enviar" : "Agotado"}
+                  {producto?.stock > 0 ? "En stock, listo para enviar" : "Agotado"}
                 </span>
               </div>
             </div>
@@ -183,25 +251,24 @@ const ProductCard = ({
             Archivos Asociados
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {product.files.map((file, index) => (
+            {files.length && files.map((file, index) => (
               <div
-                key={index}
+                key={file.id}
                 className="bg-[var(--secondary-color)] rounded-lg p-6 flex flex-col items-center text-center shadow-sm hover:shadow-lg transition-shadow duration-300"
               >
                 <span className="material-icons text-5xl text-[var(--primary-color)] mb-4">
-                  {file.icon}
+                  {'book'}
                 </span>
                 <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
-                  {file.title}
+                  {file.nombreOriginal}
                 </h3>
-                <p className="text-sm text-[var(--text-secondary)] mb-4">
-                  {file.description}
-                </p>
-                <button className="mt-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-[var(--accent-color)] rounded-full hover:bg-[var(--primary-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-[var(--secondary-color)] transition-colors">
+                <button 
+                className="mt-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-[var(--accent-color)] rounded-full hover:bg-[var(--primary-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-[var(--secondary-color)] transition-colors"
+                onClick={() => dowloadFile(file.nombre)}
+                >
                   <span className="material-icons mr-2 text-base">
                     download
                   </span>
-                  {file.downloadText}
                 </button>
               </div>
             ))}
@@ -209,6 +276,7 @@ const ProductCard = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 
