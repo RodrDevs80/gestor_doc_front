@@ -108,6 +108,23 @@ const AdminPage = () => {
     }
   }
 
+  const deleteFile = async (fileId, productId) => {
+    try {
+      const response = await api.delete(`/files/${fileId}`);
+      
+      if (response.success) {
+        console.log('Archivo eliminado exitosamente');
+        // Recargar los archivos del producto específico
+        await getFilesbyProductId(productId);
+      } else {
+        throw new Error(response.message || 'Error al eliminar el archivo');
+      }
+    } catch (error) {
+      setError(`Error al eliminar el archivo: ${error.message}`);
+      console.error('Error al eliminar archivo:', error);
+    }
+  }
+
   const handleDeleteProduct = async (id) => {
     setIsDeleting(true);
 
@@ -209,12 +226,23 @@ const AdminPage = () => {
                     {productFiles[prod.id]?.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 max-w-md">
                         {productFiles[prod.id]?.map((archivo, j) => (
-                          <a key={j} href="#" className="flex items-center text-xs text-[var(--accent-color)] hover:text-[var(--primary-color)] transition-colors p-1 bg-gray-50 rounded hover:shadow-md border-2" 
-                          onClick={() => dowloadFile(archivo.nombre)}
-                          title={archivo.nombreOriginal || archivo.nombre}>
-                            <span className="material-icons mr-1 text-sm">attachment</span>
-                            <span className="truncate flex-1">{(archivo.nombreOriginal || archivo.nombre).substring(0, 15)}...</span>
-                          </a>
+                          <div key={j} className="flex items-center justify-between text-xs bg-gray-50 rounded border p-2 hover:shadow-md transition-all min-h-8">
+                            <button 
+                              onClick={() => dowloadFile(archivo.nombre)}
+                              className="flex items-center text-[var(--accent-color)] hover:text-[var(--primary-color)] transition-colors flex-1 text-left min-w-0"
+                              title={`Descargar: ${archivo.nombreOriginal || archivo.nombre}`}
+                            >
+                              <span className="material-icons mr-2 text-sm flex-shrink-0">download</span>
+                              <span className="truncate">{(archivo.nombreOriginal || archivo.nombre).substring(0, 10)}...</span>
+                            </button>
+                            <button
+                              onClick={() => deleteFile(archivo.id, prod.id)}
+                              className="flex items-center justify-center w-7 h-7 ml-2 text-red-400 hover:text-red-600 rounded transition-colors flex-shrink-0"
+                              title={`Eliminar: ${archivo.nombreOriginal || archivo.nombre}`}
+                            >
+                              <span className="material-icons text-sm">delete_outline</span>
+                            </button>
+                          </div>
                         ))}
                       </div>
                     ) : (
@@ -229,14 +257,14 @@ const AdminPage = () => {
                           }}>
                         <span className="material-icons">attach_file</span>
                       </button>
-                                             <button 
-                       onClick={() => {
-                         setSelectedProduct(prod);
-                         setIsEditProductModalOpen(true);
-                       }}
-                       aria-label="Editar producto" className="p-2 text-[var(--accent-color)] hover:bg-[var(--background-color)] rounded-full transition-colors">
-                         <span className="material-icons">edit</span>
-                       </button>
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(prod);
+                          setIsEditProductModalOpen(true);
+                        }}
+                        aria-label="Editar producto" className="p-2 text-[var(--accent-color)] hover:bg-[var(--background-color)] rounded-full transition-colors">
+                        <span className="material-icons">edit</span>
+                      </button>
                       <button 
                       onClick={() => handleDeleteProduct(prod.id)}
                       aria-label="Eliminar producto" className="p-2 text-red-400 hover:bg-red-50 rounded-full transition-colors">
