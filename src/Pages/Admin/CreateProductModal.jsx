@@ -19,13 +19,17 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }) => {
   const onSubmit = async (data) => {
     console.log("Datos del producto:", data);
     setIsLoading(true);
-    
-    // Timeout de 2 segundos
+
+    //Timeout de 2 segundos
     setTimeout(async () => {
       try {
-        const response = await api.post("/productos", data);
-        console.log(response.data,'response.data');
-        if(response.success && response.status === 201){
+        const response = await api.post("/productos", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log(response.data, "response.data");
+        if (response.success && response.status === 201) {
           setError(null);
           reset();
           setIsLoading(false);
@@ -55,11 +59,8 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[9999]">
       {/* Backdrop con efecto blur y parallax */}
-      <div 
-        className="parallax-backdrop"
-        onClick={handleCancel}
-      />
-      
+      <div className="parallax-backdrop" onClick={handleCancel} />
+
       <div className="modal-container bg-pink-50 p-6 rounded-lg shadow-2xl w-full max-w-md border border-pink-200/50">
         {/* Botón de cerrar */}
         <button
@@ -74,7 +75,12 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }) => {
           Crear Nuevo Producto
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          encType="multipart/form-data"
+          method="post"
+          className="space-y-4"
+        >
           {/* Nombre del producto */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -190,21 +196,20 @@ const CreateProductModal = ({ isOpen, onClose, onProductCreated }) => {
             )}
           </div>
 
-          {/* URL de Imagen */}
+          {/*Imagen */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              URL de Imagen
+              Imagen
             </label>
             <input
-              type="url"
-              className="mt-1 w-full rounded-md border border-pink-300 p-2 focus:outline-none focus:ring-2 focus:ring-pink-400"
-              placeholder="https://ejemplo.com/imagen.jpg"
+              type="file"
+              className="mt-1 w-full rounded-md border border-pink-300 p-2 focus:outline-none focus:ring-2 focus:ring-pink-400 cursor-pointer"
+              placeholder="imagen.jpg"
               {...register("imagenUrl", {
-                required: "La URL de imagen es obligatoria",
+                required: "La imagen es obligatoria",
                 pattern: {
                   value: /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)$/i,
-                  message:
-                    "Debe ser una URL válida de imagen (jpg, jpeg, png, webp, gif)",
+                  message: "Debe ser una imagen (jpg, jpeg, png, webp, gif)",
                 },
               })}
             />

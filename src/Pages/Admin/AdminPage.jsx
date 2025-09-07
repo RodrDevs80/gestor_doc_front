@@ -8,7 +8,7 @@ import Loader from "../../components/Loader";
 import ProductManagementModal from "../Admin/ProductManagementModal";
 
 const AdminPage = () => {
-  // para refrescar cuando subimos archivos 
+  // para refrescar cuando subimos archivos
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [isCreateProductModalOpen, setIsCreateProductModalOpen] =
     useState(false);
@@ -132,6 +132,7 @@ const AdminPage = () => {
     setTimeout(async () => {
       try {
         const response = await api.delete(`/productos/${id}`);
+
         if (response.success && response.status === 200) {
           await fetchProductos(false); // No mostrar loading principal
         } else {
@@ -267,8 +268,9 @@ const AdminPage = () => {
                                 <button
                                   onClick={() => dowloadFile(archivo.nombre)}
                                   className="flex items-center text-[var(--accent-color)] hover:text-[var(--primary-color)] transition-colors flex-1 text-left min-w-0"
-                                  title={`Descargar: ${archivo.nombreOriginal || archivo.nombre
-                                    }`}
+                                  title={`Descargar: ${
+                                    archivo.nombreOriginal || archivo.nombre
+                                  }`}
                                 >
                                   <span className="material-icons mr-2 text-sm flex-shrink-0">
                                     download
@@ -285,8 +287,9 @@ const AdminPage = () => {
                                     deleteFile(archivo.id, prod.id)
                                   }
                                   className="flex items-center justify-center w-7 h-7 ml-2 text-red-400 hover:text-red-600 rounded transition-colors flex-shrink-0"
-                                  title={`Eliminar: ${archivo.nombreOriginal || archivo.nombre
-                                    }`}
+                                  title={`Eliminar: ${
+                                    archivo.nombreOriginal || archivo.nombre
+                                  }`}
                                 >
                                   <span className="material-icons text-sm">
                                     delete_outline
