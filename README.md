@@ -1,4 +1,4 @@
-# Documentación del Sistema de Gestión de Productos y Archivos
+# Sistema de Gestión de Productos y Archivos
 
 ## 📋 Descripción General
 
@@ -237,3 +237,272 @@ Para soporte técnico o preguntas, contactar al equipo de desarrollo o crear un 
 ---
 
 **Nota**: Esta documentación se actualiza regularmente. Asegúrate de consultar la última versión para estar al tanto de los cambios y nuevas funcionalidades.
+
+## 📋 Ejemplos de Uso
+
+### Ejemplo 1: Crear un nuevo producto
+
+```jsx
+// En tu componente
+import CreateProductModal from "./Pages/Admin/CreateProductModal";
+
+function MyComponent() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleProductCreated = () => {
+    console.log("Producto creado exitosamente");
+    // Actualizar lista de productos
+  };
+
+  return (
+    <>
+      <button onClick={() => setIsModalOpen(true)}>Crear Producto</button>
+
+      <CreateProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onProductCreated={handleProductCreated}
+      />
+    </>
+  );
+}
+```
+
+### Ejemplo 2: Subir archivos a un producto
+
+```jsx
+import FileUploadModal from "./Pages/Admin/FileUploadModal";
+
+function FileUploadExample() {
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
+  const handleFilesUploaded = () => {
+    console.log("Archivos subidos exitosamente");
+    // Actualizar lista de archivos
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => {
+          setSelectedProductId(123); // ID del producto
+          setIsUploadModalOpen(true);
+        }}
+      >
+        Subir Archivos
+      </button>
+
+      <FileUploadModal
+        productId={selectedProductId}
+        onClose={() => setIsUploadModalOpen(false)}
+        onFilesUploaded={handleFilesUploaded}
+      />
+    </>
+  );
+}
+```
+
+### Ejemplo 3: Consumir la API personalizada
+
+```jsx
+import api from "./services/api";
+
+// Obtener todos los productos
+const fetchProducts = async () => {
+  try {
+    const response = await api.get("/productos/all");
+
+    if (response.success) {
+      console.log("Productos:", response.data);
+      return response.data;
+    } else {
+      console.error("Error:", response.message);
+    }
+  } catch (error) {
+    console.error("Error en la petición:", error);
+  }
+};
+
+// Crear un nuevo producto
+const createProduct = async (productData) => {
+  try {
+    const response = await api.post("/productos", productData);
+
+    if (response.success) {
+      console.log("Producto creado:", response.data);
+      return response.data;
+    } else {
+      throw new Error(response.message);
+    }
+  } catch (error) {
+    console.error("Error creando producto:", error);
+  }
+};
+```
+
+### Ejemplo 4: Personalizar el tema de colores
+
+Para modificar la paleta de colores, edita las variables CSS en `src/css/index.css`:
+
+```css
+:root {
+  --primary-color: #your-color; /* Color principal */
+  --secondary-color: #your-color; /* Color secundario */
+  --background-color: #your-color; /* Color de fondo */
+  --text-primary: #your-color; /* Texto principal */
+  --text-secondary: #your-color; /* Texto secundario */
+  --accent-color: #your-color; /* Color de acento */
+}
+```
+
+### Ejemplo 5: Agregar nuevas rutas
+
+```jsx
+// En src/routes/AppRoutes.jsx
+import NewComponent from "../Pages/NewComponent";
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      {/* Rutas existentes */}
+      <Route path="/nueva-ruta" element={<NewComponent />} />
+
+      {/* O dentro del layout principal */}
+      <Route element={<MainLayouts />}>
+        <Route path="/ruta-con-layout" element={<OtherComponent />} />
+      </Route>
+    </Routes>
+  );
+};
+```
+
+### Ejemplo 6: Manejo de errores en peticiones API
+
+```jsx
+import api from "../services/api";
+
+const handleApiRequest = async () => {
+  try {
+    const response = await api.get("/some-endpoint");
+
+    if (response.success) {
+      // Procesar respuesta exitosa
+      console.log("Datos:", response.data);
+    } else {
+      // Manejar error específico de la API
+      console.error("Error API:", response.message);
+      alert(response.message);
+    }
+  } catch (error) {
+    // Manejar errores de red u otros
+    console.error("Error de red:", error.message);
+    alert("Error de conexión");
+  }
+};
+```
+
+### Ejemplo 7: Personalizar el componente Loader
+
+```jsx
+import Loader from "../components/Loader";
+
+// Con título personalizado
+<Loader title="Procesando tu solicitud..." />;
+
+// Con tiempo de carga específico
+const [isLoading, setIsLoading] = useState(false);
+
+const fetchData = async () => {
+  setIsLoading(true);
+  setTimeout(async () => {
+    try {
+      await api.get("/data");
+    } finally {
+      setIsLoading(false);
+    }
+  }, 2000); // 2 segundos de loading
+};
+```
+
+## 🔧 Configuración Avanzada
+
+### Variables de Entorno Adicionales
+
+```bash
+# .env
+VITE_API_BASE_URL=http://localhost:3000/api/v1
+VITE_APP_NAME="Gestor de Documentos"
+VITE_MAX_FILE_SIZE=10485760 # 10MB en bytes
+VITE_ALLOWED_FILE_TYPES=image/*,application/pdf,.docx,.xlsx
+```
+
+### Personalización de Estilos
+
+Los componentes utilizan clases de Tailwind CSS junto con las variables CSS personalizadas. Para modificar estilos:
+
+1. **Global**: Editar `src/css/index.css`
+2. **Componentes específicos**: Usar clases de Tailwind o CSS modules
+3. **Tema**: Modificar las variables CSS en `:root`
+
+### Extender la API Client
+
+```jsx
+// En src/services/api.js
+api.interceptors.request.use((config) => {
+  // Agregar headers personalizados
+  config.headers["X-Custom-Header"] = "value";
+  return config;
+});
+
+// Agregar métodos personalizados
+api.downloadFile = async (fileName) => {
+  return api.get(`/files/download/${fileName}`, {
+    responseType: "blob",
+  });
+};
+```
+
+## 📱 Responsive Design
+
+La aplicación está diseñada para ser responsive utilizando:
+
+- Grid de Tailwind CSS (`grid-cols-1 md:grid-cols-2 lg:grid-cols-3`)
+- Flexbox para layouts flexibles
+- Breakpoints predefinidos de Tailwind (sm, md, lg, xl)
+
+## 🎯 Buenas Prácticas Implementadas
+
+1. **Manejo de errores**: Interceptores de API para respuestas uniformes
+2. **Loading states**: Feedback visual durante operaciones asíncronas
+3. **Validación de formularios**: React Hook Form con validaciones
+4. **Responsive design**: Adaptable a diferentes dispositivos
+5. **Componentes reutilizables**: Arquitectura modular
+6. **Manejo de estado local**: useState para estado del componente
+7. **Efectos visuales**: Animaciones y transiciones suaves
+
+## 🔍 Debugging
+
+Para debugging, se recomienda:
+
+1. **Console logs**: Revisar la consola del navegador
+2. **React DevTools**: Inspeccionar componentes y props
+3. **Network tab**: Verificar peticiones HTTP
+4. **LocalStorage**: Verificar estado de autenticación
+
+```javascript
+// Debugging de peticiones API
+api.interceptors.request.use((config) => {
+  console.log("Request:", config);
+  return config;
+});
+
+api.interceptors.response.use((response) => {
+  console.log("Response:", response);
+  return response;
+});
+```
+
+---
+
+**¿Necesitas más ayuda?** Revisa los componentes de ejemplo o crea un issue en el repositorio para soporte específico.
